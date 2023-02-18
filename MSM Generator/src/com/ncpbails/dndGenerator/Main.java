@@ -165,6 +165,63 @@ public class Main {
                 comboButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 comboButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add padding
                 buttonPanel.add(comboButton);
+
+                //Create Combo Panel
+                JPanel comboDisplay = new JPanel(new GridLayout(0, 8));
+                comboDisplay.setBackground(buttonColour);
+                comboDisplay.setForeground(titleColour);
+                comboDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add padding
+                buttonPanel.add(comboDisplay);
+
+                //Create Combo Panel Info
+                char[] charaArray = combo.toCharArray();
+                String[] fiveElement = new String[charaArray.length];
+                for (int i = 0; i < charaArray.length; i++) {
+                    fiveElement[i] = Character.toString(charaArray[i]);
+                }
+                int len = fiveElement.length;
+                List<String> fivez = new ArrayList<>();
+                for (int i = 1; i <= len; i++) {
+                    generateCombinations(fiveElement, i, 0, new StringBuilder(), fivez);
+                }
+                int numOf1 = 0;
+                int numOf2 = 0;
+                int numOf3 = 0;
+                int numOf4 = 0;
+                int numOf5 = 0;
+                int numOf6 = 0;
+                int numOf7 = 0;
+                int numOf8 = 0;
+
+                for (String fivoz : fivez) {
+                    if (Objects.equals(fivoz, "1")) {
+                        numOf1 ++;
+                    } else if (Objects.equals(fivoz, "2")) {
+                        numOf2 ++;
+                    } else if (Objects.equals(fivoz, "3")) {
+                        numOf3 ++;
+                    } else if (Objects.equals(fivoz, "4")) {
+                        numOf4 ++;
+                    } else if (Objects.equals(fivoz, "5")) {
+                        numOf5 ++;
+                    } else if (Objects.equals(fivoz, "6")) {
+                        numOf6 ++;
+                    } else if (Objects.equals(fivoz, "7")) {
+                        numOf7 ++;
+                    } else if (Objects.equals(fivoz, "8")) {
+                        numOf8 ++;
+                    }
+                }
+                makeInfoLabel(numOf1, comboDisplay, textBoxColour1);
+                makeInfoLabel(numOf2, comboDisplay, textBoxColour2);
+                makeInfoLabel(numOf3, comboDisplay, textBoxColour3);
+                makeInfoLabel(numOf4, comboDisplay, textBoxColour4);
+                makeInfoLabel(numOf5, comboDisplay, textBoxColour5);
+                makeInfoLabel(numOf6, comboDisplay, textBoxColour6);
+                makeInfoLabel(numOf7, comboDisplay, textBoxColour7);
+                makeInfoLabel(numOf8, comboDisplay, textBoxColour8);
+
                 //Listen to 5 Element Combo Button
                 comboButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent saveClick) {
@@ -302,6 +359,7 @@ public class Main {
             sb.deleteCharAt(sb.length() - 1);
         }
     }
+    //Set Text Colour Based on Value
     private static void setTextColour(JTextField textBox, String string) {
         Color textColour = null;
         if (Objects.equals(string, "1")) {
@@ -321,5 +379,13 @@ public class Main {
         } else if (Objects.equals(string, "8")) {
             textBox.setBackground(textBoxColour8);
         }
+    }
+    //Make Info Label for Each 5 Elem Combo
+    private static void makeInfoLabel(int numOfX, JPanel panel, Color colour) {
+        JLabel comboDisplayInfo = new JLabel(String.valueOf(numOfX));
+        comboDisplayInfo.setForeground(colour);
+        comboDisplayInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        comboDisplayInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(comboDisplayInfo);
     }
 }
