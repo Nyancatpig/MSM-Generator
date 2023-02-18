@@ -20,6 +20,14 @@ public class Main {
     static Color titleColour = new Color(164, 165, 169);
     static Color optionColour = new Color(192, 193, 194);
     static Color buttonColour = new Color(51, 55, 60);
+    static Color textBoxColour1 = new Color(89, 111, 163);
+    static Color textBoxColour2 = new Color(118, 92, 150);
+    static Color textBoxColour3 = new Color(163, 132, 152);
+    static Color textBoxColour4 = new Color(142, 87, 101);
+    static Color textBoxColour5 = new Color(147, 121, 102);
+    static Color textBoxColour6 = new Color(147, 143, 92);
+    static Color textBoxColour7 = new Color(84, 134, 110);
+    static Color textBoxColour8 = new Color(117, 146, 157);
 
     public static void main(String[] args) {
         // Get absolute path of the files directory
@@ -66,52 +74,81 @@ public class Main {
         nestedPanel.add(saveButton, BorderLayout.NORTH);
         nestedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        //Listen to Blank Array Button
+        //Listen to Blank Array Button, Open Double Check Window
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent saveClick) {
-                String[] elements = {"A", "B", "C", "D", "E", "F", "G", "H"};
-                int len = elements.length;
-                List<String> combos = new ArrayList<>();
-                for (int i = 1; i <= len; i++) {
-                    generateCombinations(elements, i, 0, new StringBuilder(), combos);
-                }
+                //Create 5 Elem Combo Window
+                JFrame remakeWindow = new JFrame("Double Check");
+                remakeWindow.setSize(300, 100);
+                remakeWindow.getContentPane().setBackground(backgroundColour);
+                remakeWindow.setVisible(true);
+                remakeWindow.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-                // Generate a timestamp to use as the filename suffix
-                DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-                String filenameSuffix = dateFormat.format(new Date());
+                //Create 5 Elem Combo Nested Panel
+                JPanel remakeNestedPanel = new JPanel();
+                remakeNestedPanel.setLayout(new BoxLayout(remakeNestedPanel, BoxLayout.PAGE_AXIS));
+                remakeNestedPanel.setBackground(backgroundColour);
+                remakeWindow.add(remakeNestedPanel);
 
-                //Create the filename using the original filename and the timestamp suffix
-                //String newFilename = absPath + "/files" + "Monster Array" + filenameSuffix + ".txt";
-                String newFilename = (absPath + "Monster Array" + ".txt");
+                //Create Yes Button
+                JButton yesButton = new JButton("Yes, Create New Array");
+                yesButton.setBackground(buttonColour);
+                yesButton.setForeground(titleColour);
+                yesButton.setBorderPainted(false);
+                yesButton.setHorizontalAlignment(SwingConstants.CENTER);
+                yesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                remakeWindow.add(yesButton);
+                remakeNestedPanel.add(yesButton, BorderLayout.NORTH);
+                remakeNestedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-                // Create a new thread to handle the file writing
-                new Thread(new Runnable() {
-                    public void run() {
-                        //Open a new PrintWriter with the new filename
-                        try (PrintWriter writer = new PrintWriter(newFilename)) {
-                            //Split the text of the label into an array of strings
-                            //Write each element of the array to the file
-                            for (String combos : combos) {
-                                writer.println(combos);
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
+                //Listen to Yes Button, Clear Array
+                yesButton.addActionListener((new ActionListener() {
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        String[] elements = {"A", "B", "C", "D", "E", "F", "G", "H"};
+                        int len = elements.length;
+                        List<String> combos = new ArrayList<>();
+                        for (int i = 1; i <= len; i++) {
+                            generateCombinations(elements, i, 0, new StringBuilder(), combos);
                         }
-                    }
-                }).start();
 
-                for (String combo : combos) {
-                    //Create the filename using the original filename, the element in the array, and the timestamp suffix
-                    String comboFileName = absPath + "/combinations/" + combo + ".txt";
-                    //Open a new PrintWriter with the new filename
-                    try (PrintWriter writer = new PrintWriter(comboFileName)) {
-                        //Write the current element to the file
-                        writer.println(combo);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
+                        // Generate a timestamp to use as the filename suffix
+                        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                        String filenameSuffix = dateFormat.format(new Date());
 
+                        //Create the filename using the original filename and the timestamp suffix
+                        //String newFilename = absPath + "/files" + "Monster Array" + filenameSuffix + ".txt";
+                        String newFilename = (absPath + "Monster Array" + ".txt");
+
+                        // Create a new thread to handle the file writing
+                        new Thread(new Runnable() {
+                            public void run() {
+                                //Open a new PrintWriter with the new filename
+                                try (PrintWriter writer = new PrintWriter(newFilename)) {
+                                    //Split the text of the label into an array of strings
+                                    //Write each element of the array to the file
+                                    for (String combos : combos) {
+                                        writer.println(combos);
+                                    }
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+
+                        for (String combo : combos) {
+                            //Create the filename using the original filename, the element in the array, and the timestamp suffix
+                            String comboFileName = absPath + "/combinations/" + combo + ".txt";
+                            //Open a new PrintWriter with the new filename
+                            try (PrintWriter writer = new PrintWriter(comboFileName)) {
+                                //Write the current element to the file
+                                writer.println(combo);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        remakeWindow.dispose();
+                    }
+                }));
             }
         });
 
@@ -134,7 +171,6 @@ public class Main {
                         //Create 5 Elem Combo Window
                         JFrame comboWindow = new JFrame(combo);
                         comboWindow.setSize(600, 400);
-                        comboWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                         comboWindow.getContentPane().setBackground(backgroundColour);
                         comboWindow.setVisible(true);
                         comboWindow.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
@@ -196,7 +232,7 @@ public class Main {
                                 comboButtonPanel.add(textField);
                                 comboWindow.revalidate();
                                 comboWindow.repaint();
-
+                                setTextColour(textField, new String(Files.readAllBytes(path)));
                                 //Listen to Text Box
                                 textField.addActionListener(event -> {
                                     if (textField.getText().chars().allMatch(Character::isDigit)) {
@@ -204,6 +240,7 @@ public class Main {
                                         if (itemTextNum > 0 && itemTextNum < 9) {
                                             try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
                                                 writer.write(textField.getText());
+                                                setTextColour(textField, new String(Files.readAllBytes(path)));
                                                 comboWindow.revalidate();
                                                 comboWindow.repaint();
                                             } catch (IOException e) {
@@ -226,6 +263,7 @@ public class Main {
                                                 Path changedPath = (Path) event.context();
                                                 if (changedPath.getFileName().equals(path.getFileName())) {
                                                     textField.setText(new String(Files.readAllBytes(path)));
+                                                    setTextColour(textField, new String(Files.readAllBytes(path)));
                                                 }
                                             }
                                             key.reset();
@@ -234,6 +272,7 @@ public class Main {
                                         throw new RuntimeException(e);
                                     }
                                 }).start();
+
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
@@ -261,6 +300,26 @@ public class Main {
             sb.append(elements[i]);
             generateCombinations(elements, len, i + 1, sb, combos);
             sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+    private static void setTextColour(JTextField textBox, String string) {
+        Color textColour = null;
+        if (Objects.equals(string, "1")) {
+            textBox.setBackground(textBoxColour1);
+        } else if (Objects.equals(string, "2")) {
+            textBox.setBackground(textBoxColour2);
+        } else if (Objects.equals(string, "3")) {
+            textBox.setBackground(textBoxColour3);
+        } else if (Objects.equals(string, "4")) {
+            textBox.setBackground(textBoxColour4);
+        } else if (Objects.equals(string, "5")) {
+            textBox.setBackground(textBoxColour5);
+        } else if (Objects.equals(string, "6")) {
+            textBox.setBackground(textBoxColour6);
+        } else if (Objects.equals(string, "7")) {
+            textBox.setBackground(textBoxColour7);
+        } else if (Objects.equals(string, "8")) {
+            textBox.setBackground(textBoxColour8);
         }
     }
 }
