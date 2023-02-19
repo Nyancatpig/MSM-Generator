@@ -29,7 +29,7 @@ public class Main {
     static Color textBoxColour7 = new Color(84, 134, 110);
     static Color textBoxColour8 = new Color(117, 146, 157);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Get absolute path of the files directory
         File filesDir = new File("files");
         String absPath = filesDir.getAbsolutePath();
@@ -51,7 +51,7 @@ public class Main {
 
         //Create Window
         JFrame mainWindow = new JFrame("MSM Generator");
-        mainWindow.setSize(600, 400);
+        mainWindow.setSize(750, 725);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.getContentPane().setBackground(backgroundColour);
         mainWindow.setVisible(true);
@@ -65,7 +65,7 @@ public class Main {
 
         //Create Blank Array Button
         JButton saveButton = new JButton("Create Blank Monster Arrays");
-        saveButton.setBackground(buttonColour);
+        saveButton.setBackground(topColour);
         saveButton.setForeground(titleColour);
         saveButton.setBorderPainted(false);
         saveButton.setHorizontalAlignment(SwingConstants.CENTER);
@@ -119,7 +119,7 @@ public class Main {
                         //String newFilename = absPath + "/files" + "Monster Array" + filenameSuffix + ".txt";
                         String newFilename = (absPath + "Monster Array" + ".txt");
 
-                        // Create a new thread to handle the file writing
+                        //Create a new thread to handle the file writing
                         new Thread(new Runnable() {
                             public void run() {
                                 //Open a new PrintWriter with the new filename
@@ -168,7 +168,7 @@ public class Main {
 
                 //Create Combo Panel
                 JPanel comboDisplay = new JPanel(new GridLayout(0, 8));
-                comboDisplay.setBackground(buttonColour);
+                comboDisplay.setBackground(textBoxColour);
                 comboDisplay.setForeground(titleColour);
                 comboDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
                 comboDisplay.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add padding
@@ -176,51 +176,177 @@ public class Main {
 
                 //Create Combo Panel Info
                 char[] charaArray = combo.toCharArray();
-                String[] fiveElement = new String[charaArray.length];
+                String[] fiveElement = new String[charaArray.length]; //Create array of every element in combo of 5
                 for (int i = 0; i < charaArray.length; i++) {
                     fiveElement[i] = Character.toString(charaArray[i]);
                 }
                 int len = fiveElement.length;
-                List<String> fivez = new ArrayList<>();
+                List<String> fivez = new ArrayList<>(); //Create all combos of 5 elements
                 for (int i = 1; i <= len; i++) {
                     generateCombinations(fiveElement, i, 0, new StringBuilder(), fivez);
                 }
-                int numOf1 = 0;
-                int numOf2 = 0;
-                int numOf3 = 0;
-                int numOf4 = 0;
-                int numOf5 = 0;
-                int numOf6 = 0;
-                int numOf7 = 0;
-                int numOf8 = 0;
+
+                List<String> arrayOf1s = new ArrayList<>();
+                List<String> arrayOf2s = new ArrayList<>();
+                List<String> arrayOf3s = new ArrayList<>();
+                List<String> arrayOf4s = new ArrayList<>();
+                List<String> arrayOf5s = new ArrayList<>();
+                List<String> arrayOf6s = new ArrayList<>();
+                List<String> arrayOf7s = new ArrayList<>();
+                List<String> arrayOf8s = new ArrayList<>();
 
                 for (String fivoz : fivez) {
-                    if (Objects.equals(fivoz, "1")) {
-                        numOf1 ++;
-                    } else if (Objects.equals(fivoz, "2")) {
-                        numOf2 ++;
-                    } else if (Objects.equals(fivoz, "3")) {
-                        numOf3 ++;
-                    } else if (Objects.equals(fivoz, "4")) {
-                        numOf4 ++;
-                    } else if (Objects.equals(fivoz, "5")) {
-                        numOf5 ++;
-                    } else if (Objects.equals(fivoz, "6")) {
-                        numOf6 ++;
-                    } else if (Objects.equals(fivoz, "7")) {
-                        numOf7 ++;
-                    } else if (Objects.equals(fivoz, "8")) {
-                        numOf8 ++;
+                    Path path5 = Paths.get(absPath + "/combinations/" + fivoz + ".txt");
+                    if (Files.readString(path5).equals("1")) {
+                        arrayOf1s.add(fivoz);
+                    } else if (Files.readString(path5).equals("2")) {
+                        arrayOf2s.add(fivoz);
+                    } else if (Files.readString(path5).equals("3")) {
+                        arrayOf3s.add(fivoz);
+                    } else if (Files.readString(path5).equals("4")) {
+                        arrayOf4s.add(fivoz);
+                    } else if (Files.readString(path5).equals("5")) {
+                        arrayOf5s.add(fivoz);
+                    } else if (Files.readString(path5).equals("6")) {
+                        arrayOf6s.add(fivoz);
+                    } else if (Files.readString(path5).equals("7")) {
+                        arrayOf7s.add(fivoz);
+                    } else if (Files.readString(path5).equals("8")) {
+                        arrayOf8s.add(fivoz);
                     }
                 }
-                makeInfoLabel(numOf1, comboDisplay, textBoxColour1);
-                makeInfoLabel(numOf2, comboDisplay, textBoxColour2);
-                makeInfoLabel(numOf3, comboDisplay, textBoxColour3);
-                makeInfoLabel(numOf4, comboDisplay, textBoxColour4);
-                makeInfoLabel(numOf5, comboDisplay, textBoxColour5);
-                makeInfoLabel(numOf6, comboDisplay, textBoxColour6);
-                makeInfoLabel(numOf7, comboDisplay, textBoxColour7);
-                makeInfoLabel(numOf8, comboDisplay, textBoxColour8);
+
+                JLabel comboDisplayInfo1 = new JLabel(String.valueOf(arrayOf1s.toArray().length));
+                comboDisplayInfo1.setForeground(textBoxColour1);
+                comboDisplayInfo1.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo1.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo1);
+                JLabel comboDisplayInfo2 = new JLabel(String.valueOf(arrayOf2s.toArray().length));
+                comboDisplayInfo2.setForeground(textBoxColour2);
+                comboDisplayInfo2.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo2.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo2);
+                JLabel comboDisplayInfo3 = new JLabel(String.valueOf(arrayOf3s.toArray().length));
+                comboDisplayInfo3.setForeground(textBoxColour3);
+                comboDisplayInfo3.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo3.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo3);
+                JLabel comboDisplayInfo4 = new JLabel(String.valueOf(arrayOf4s.toArray().length));
+                comboDisplayInfo4.setForeground(textBoxColour4);
+                comboDisplayInfo4.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo4.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo4);
+                JLabel comboDisplayInfo5 = new JLabel(String.valueOf(arrayOf5s.toArray().length));
+                comboDisplayInfo5.setForeground(textBoxColour5);
+                comboDisplayInfo5.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo5.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo5);
+                JLabel comboDisplayInfo6 = new JLabel(String.valueOf(arrayOf6s.toArray().length));
+                comboDisplayInfo6.setForeground(textBoxColour6);
+                comboDisplayInfo6.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo6.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo6);
+                JLabel comboDisplayInfo7 = new JLabel(String.valueOf(arrayOf7s.toArray().length));
+                comboDisplayInfo7.setForeground(textBoxColour7);
+                comboDisplayInfo7.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo7.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo7);
+                JLabel comboDisplayInfo8 = new JLabel(String.valueOf(arrayOf8s.toArray().length));
+                comboDisplayInfo8.setForeground(textBoxColour8);
+                comboDisplayInfo8.setHorizontalAlignment(SwingConstants.CENTER);
+                comboDisplayInfo8.setAlignmentX(Component.CENTER_ALIGNMENT);
+                comboDisplay.add(comboDisplayInfo8);
+
+                for (String fiveez : fivez) {
+                    Path path = Paths.get(absPath + "/combinations/" + fiveez +".txt");
+
+                    // create watch service and register the path to watch for changes
+                    WatchService watchService = FileSystems.getDefault().newWatchService();
+                    path.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+
+                    //Update Text when File is Changed
+                    new Thread(() -> {
+                        try {
+                            while (true) {
+                                WatchKey key = watchService.take(); // wait for a file change
+                                for (WatchEvent<?> event : key.pollEvents()) {
+                                    Path changedPath = (Path) event.context();
+                                    if (changedPath.getFileName().equals(path.getFileName())) {
+                                        if (arrayOf1s.contains(fiveez)) {
+                                            arrayOf1s.remove(fiveez);
+                                        } else if (arrayOf2s.contains(fiveez)) {
+                                            arrayOf2s.remove(fiveez);
+                                        } else if (arrayOf3s.contains(fiveez)) {
+                                            arrayOf3s.remove(fiveez);
+                                        } else if (arrayOf4s.contains(fiveez)) {
+                                            arrayOf4s.remove(fiveez);
+                                        } else if (arrayOf5s.contains(fiveez)) {
+                                            arrayOf5s.remove(fiveez);
+                                        } else if (arrayOf6s.contains(fiveez)) {
+                                            arrayOf6s.remove(fiveez);
+                                        } else if (arrayOf7s.contains(fiveez)) {
+                                            arrayOf7s.remove(fiveez);
+                                        } else if (arrayOf8s.contains(fiveez)) {
+                                            arrayOf8s.remove(fiveez);
+                                        }
+
+                                        if (Files.readString(path).equals("1")) {
+                                            arrayOf1s.add(fiveez);
+                                        } else if (Files.readString(path).equals("2")) {
+                                            arrayOf2s.add(fiveez);
+                                        } else if (Files.readString(path).equals("3")) {
+                                            arrayOf3s.add(fiveez);
+                                        } else if (Files.readString(path).equals("4")) {
+                                            arrayOf4s.add(fiveez);
+                                        } else if (Files.readString(path).equals("5")) {
+                                            arrayOf5s.add(fiveez);
+                                        } else if (Files.readString(path).equals("6")) {
+                                            arrayOf6s.add(fiveez);
+                                        } else if (Files.readString(path).equals("7")) {
+                                            arrayOf7s.add(fiveez);
+                                        } else if (Files.readString(path).equals("8")) {
+                                            arrayOf8s.add(fiveez);
+                                        }
+
+                                        comboDisplayInfo1.setText(String.valueOf(arrayOf1s.toArray().length));
+                                        comboDisplayInfo2.setText(String.valueOf(arrayOf2s.toArray().length));
+                                        comboDisplayInfo3.setText(String.valueOf(arrayOf3s.toArray().length));
+                                        comboDisplayInfo4.setText(String.valueOf(arrayOf4s.toArray().length));
+                                        comboDisplayInfo5.setText(String.valueOf(arrayOf5s.toArray().length));
+                                        comboDisplayInfo6.setText(String.valueOf(arrayOf6s.toArray().length));
+                                        comboDisplayInfo7.setText(String.valueOf(arrayOf7s.toArray().length));
+                                        comboDisplayInfo8.setText(String.valueOf(arrayOf8s.toArray().length));
+
+                                        if (arrayOf1s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour1);
+                                        } else if (arrayOf2s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour2);
+                                        } else if (arrayOf3s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour3);
+                                        } else if (arrayOf4s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour4);
+                                        } else if (arrayOf5s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour5);
+                                        } else if (arrayOf6s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour6);
+                                        } else if (arrayOf7s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour7);
+                                        } else if (arrayOf8s.toArray().length > 4) {
+                                            comboButton.setBackground(textBoxColour8);
+                                        } else {
+                                            comboButton.setBackground(buttonColour);
+                                        }
+                                    }
+                                }
+                                key.reset();
+                            }
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).start();
+                }
 
                 //Listen to 5 Element Combo Button
                 comboButton.addActionListener(new ActionListener() {
@@ -378,14 +504,8 @@ public class Main {
             textBox.setBackground(textBoxColour7);
         } else if (Objects.equals(string, "8")) {
             textBox.setBackground(textBoxColour8);
+        }else {
+            textBox.setBackground(textBoxColour);
         }
-    }
-    //Make Info Label for Each 5 Elem Combo
-    private static void makeInfoLabel(int numOfX, JPanel panel, Color colour) {
-        JLabel comboDisplayInfo = new JLabel(String.valueOf(numOfX));
-        comboDisplayInfo.setForeground(colour);
-        comboDisplayInfo.setHorizontalAlignment(SwingConstants.CENTER);
-        comboDisplayInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(comboDisplayInfo);
     }
 }
