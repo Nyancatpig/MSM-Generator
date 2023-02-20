@@ -3,6 +3,7 @@ package com.ncpbails.dndGenerator;
 import java.awt.*;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     static Color backgroundColour = new Color(58, 60, 66);
@@ -32,8 +34,23 @@ public class Main {
     static Color textBoxColour8 = new Color(117, 146, 157);
 
     static int islandElemCount = 4;
+    static int islandMax = 0;
+
 
     public static void main(String[] args) throws IOException {
+        if (islandElemCount == 5) {
+            islandMax = 4;
+        } else if (islandElemCount == 4) {
+            islandMax = 2;
+        } else if (islandElemCount <= 3) {
+            islandMax = 1;
+        } else if (islandElemCount == 6) {
+            islandMax = 6;
+        } else if (islandElemCount == 7) {
+            islandMax = 8;
+        } else if (islandElemCount == 8) {
+            islandMax = 10;
+        }
         // Get absolute path of the files directory
         File filesDir = new File("files");
         String absPath = filesDir.getAbsolutePath();
@@ -60,6 +77,7 @@ public class Main {
         mainWindow.getContentPane().setBackground(backgroundColour);
         mainWindow.setVisible(true);
         mainWindow.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        List<JButton> arrayOfButtons = new ArrayList<>();
 
         //Create Nested Panel
         JPanel nestedPanel = new JPanel();
@@ -76,6 +94,17 @@ public class Main {
         saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainWindow.add(saveButton);
         nestedPanel.add(saveButton, BorderLayout.NORTH);
+        nestedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        //Create Randomise Array Button
+        JButton randomButton = new JButton("Randomise Monster Arrays");
+        randomButton.setBackground(topColour);
+        randomButton.setForeground(titleColour);
+        randomButton.setBorderPainted(false);
+        randomButton.setHorizontalAlignment(SwingConstants.CENTER);
+        randomButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainWindow.add(randomButton);
+        nestedPanel.add(randomButton, BorderLayout.NORTH);
         nestedPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         //Listen to Blank Array Button, Open Double Check Window
@@ -156,6 +185,83 @@ public class Main {
             }
         });
 
+        //Listen to Random Array Button
+        randomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent saveClick) {
+                String[] elements = {"A", "B", "C", "D", "E", "F", "G", "H"};
+                int len = elements.length;
+                List<String> combos = new ArrayList<>();
+                for (int i = 1; i <= len; i++) {
+                    generateCombinations(elements, i, 0, new StringBuilder(), combos);
+                }
+
+                // Generate a timestamp to use as the filename suffix
+                DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                String filenameSuffix = dateFormat.format(new Date());
+
+                //Create the filename using the original filename and the timestamp suffix
+                //String newFilename = absPath + "/files" + "Monster Array" + filenameSuffix + ".txt";
+                String newFilename = (absPath + "Monster Array" + ".txt");
+
+                //Create a new thread to handle the file writing
+                new Thread(new Runnable() {
+                    public void run() {
+                        //Open a new PrintWriter with the new filename
+                        try (PrintWriter writer = new PrintWriter(newFilename)) {
+                            //Split the text of the label into an array of strings
+                            //Write each element of the array to the file
+                            for (String combos : combos) {
+                                writer.println(combos);
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                for (String combo : combos) {
+                    if (combo.length() != 1) {
+                        //Create the filename using the original filename, the element in the array, and the timestamp suffix
+                        String comboFileName = absPath + "/combinations/" + combo + ".txt";
+                        //Open a new PrintWriter with the new filename
+                        try (PrintWriter writer = new PrintWriter(comboFileName)) {
+                            //Write the current element to the file
+                            Random random = new Random();
+                            int randomNum = random.nextInt(8) + 1;
+                            writer.print(randomNum);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                boolean mustReroll = false;
+                for (JButton butt : arrayOfButtons) {
+                    if (butt.getBackground() != buttonColour) {
+                        mustReroll = true;
+                    }
+                }
+                if (mustReroll) {
+                    // Repaint the GUI to update the button colors
+                    mainWindow.pack();
+                    mainWindow.revalidate();
+                    mainWindow.repaint();
+                    nestedPanel.revalidate();
+                    nestedPanel.repaint();
+                    // Set up a Swing Timer to delay the randomization
+                    Timer timer = new Timer(1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            randomButton.doClick();
+                            System.out.println(1);
+                        }
+                    });
+                    // Start the timer
+                    timer.setRepeats(false);
+                    timer.start();
+                }
+            }
+        });
+
         //Create Buttons for each Element Combination
         JPanel buttonPanel = new JPanel(new GridLayout(0, 8, 10, 10));
         buttonPanel.setBackground(backgroundColour);
@@ -169,6 +275,7 @@ public class Main {
                 comboButton.setAlignmentX(Component.CENTER_ALIGNMENT);
                 comboButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add padding
                 buttonPanel.add(comboButton);
+                arrayOfButtons.add(comboButton);
 
                 //Create Combo Panel
                 JPanel comboDisplay = new JPanel(new GridLayout(0, 8));
@@ -260,7 +367,52 @@ public class Main {
                 comboDisplayInfo8.setHorizontalAlignment(SwingConstants.CENTER);
                 comboDisplayInfo8.setAlignmentX(Component.CENTER_ALIGNMENT);
                 comboDisplay.add(comboDisplayInfo8);
-
+                if (arrayOf1s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour1);
+                } else if (arrayOf2s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour2);
+                } else if (arrayOf3s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour3);
+                } else if (arrayOf4s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour4);
+                } else if (arrayOf5s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour5);
+                } else if (arrayOf6s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour6);
+                } else if (arrayOf7s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour7);
+                } else if (arrayOf8s.toArray().length > islandMax) {
+                    comboButton.setBackground(textBoxColour8);
+                } else {
+                    if (arrayOf1s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour1);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf2s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour2);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf3s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour3);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf4s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour4);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf5s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour5);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf6s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour6);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf7s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour7);
+                        comboButton.setForeground(topColour);
+                    } else if (arrayOf8s.toArray().length == 0) {
+                        comboButton.setBackground(textBoxColour8);
+                        comboButton.setForeground(topColour);
+                    } else {
+                        comboButton.setBackground(buttonColour);
+                        comboButton.setForeground(titleColour);
+                    }
+                }
                 for (String fiveez : fivez) {
                     Path path = Paths.get(absPath + "/combinations/" + fiveez +".txt");
 
@@ -321,24 +473,51 @@ public class Main {
                                         comboDisplayInfo7.setText(String.valueOf(arrayOf7s.toArray().length));
                                         comboDisplayInfo8.setText(String.valueOf(arrayOf8s.toArray().length));
 
-                                        if (arrayOf1s.toArray().length > 4) {
+                                        if (arrayOf1s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour1);
-                                        } else if (arrayOf2s.toArray().length > 4) {
+                                        } else if (arrayOf2s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour2);
-                                        } else if (arrayOf3s.toArray().length > 4) {
+                                        } else if (arrayOf3s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour3);
-                                        } else if (arrayOf4s.toArray().length > 4) {
+                                        } else if (arrayOf4s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour4);
-                                        } else if (arrayOf5s.toArray().length > 4) {
+                                        } else if (arrayOf5s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour5);
-                                        } else if (arrayOf6s.toArray().length > 4) {
+                                        } else if (arrayOf6s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour6);
-                                        } else if (arrayOf7s.toArray().length > 4) {
+                                        } else if (arrayOf7s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour7);
-                                        } else if (arrayOf8s.toArray().length > 4) {
+                                        } else if (arrayOf8s.toArray().length > islandMax) {
                                             comboButton.setBackground(textBoxColour8);
                                         } else {
-                                            comboButton.setBackground(buttonColour);
+                                            if (arrayOf1s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour1);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf2s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour2);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf3s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour3);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf4s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour4);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf5s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour5);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf6s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour6);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf7s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour7);
+                                                comboButton.setForeground(topColour);
+                                            } else if (arrayOf8s.toArray().length == 0) {
+                                                comboButton.setBackground(textBoxColour8);
+                                                comboButton.setForeground(topColour);
+                                            } else {
+                                                comboButton.setBackground(buttonColour);
+                                                comboButton.setForeground(titleColour);
+                                            }
                                         }
                                     }
                                 }
@@ -358,76 +537,78 @@ public class Main {
                         // Handle click event here
                         Random random = new Random();
                         String removedCombo = "Null Element";
-                        int islandMax = 0;
-                        if (islandElemCount == 5) {
-                            islandMax = 4;
-                        } else if (islandElemCount == 4) {
-                            islandMax = 2;
-                        } else if (islandElemCount <= 3) {
-                            islandMax = 1;
-                        } else if (islandElemCount == 6) {
-                            islandMax = 6;
-                        } else if (islandElemCount == 7) {
-                            islandMax = 8;
-                        } else if (islandElemCount == 8) {
-                            islandMax = 10;
-                        }
 
                         if (arrayOf1s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf1s.size());
                             removedCombo = arrayOf1s.get(randomIndex);
-                            arrayOf1s.remove(arrayOf1s.get(randomIndex));
+                            if (removedCombo.length() != 1) {
+                                arrayOf1s.remove(arrayOf1s.get(randomIndex));
                             resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf2s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf2s.size());
                             removedCombo = arrayOf2s.get(randomIndex);
-                            arrayOf2s.remove(arrayOf2s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf2s.remove(arrayOf2s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf3s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf3s.size());
                             removedCombo = arrayOf3s.get(randomIndex);
-                            arrayOf3s.remove(arrayOf3s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                                if (removedCombo.length() != 1) {
+                                arrayOf3s.remove(arrayOf3s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                                }
                         }
                         else if (arrayOf4s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf4s.size());
                             removedCombo = arrayOf4s.get(randomIndex);
-                            arrayOf4s.remove(arrayOf4s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf4s.remove(arrayOf4s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf5s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf5s.size());
                             removedCombo = arrayOf5s.get(randomIndex);
-                            arrayOf5s.remove(arrayOf5s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf5s.remove(arrayOf5s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf6s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf6s.size());
                             removedCombo = arrayOf6s.get(randomIndex);
-                            arrayOf6s.remove(arrayOf6s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf6s.remove(arrayOf6s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf7s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf7s.size());
                             removedCombo = arrayOf7s.get(randomIndex);
-                            arrayOf7s.remove(arrayOf7s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf7s.remove(arrayOf7s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         else if (arrayOf8s.toArray().length > islandMax) {
                             int randomIndex = random.nextInt(arrayOf8s.size());
                             removedCombo = arrayOf8s.get(randomIndex);
-                            arrayOf8s.remove(arrayOf8s.get(randomIndex));
-                            resetNum(random, absPath, removedCombo, mainWindow, comboButton,
+                            if (removedCombo.length() != 1) {
+                                arrayOf8s.remove(arrayOf8s.get(randomIndex));
+                                resetNum(random, absPath, removedCombo, mainWindow, comboButton,
                                     arrayOf1s, arrayOf2s, arrayOf3s, arrayOf4s, arrayOf5s, arrayOf6s, arrayOf7s, arrayOf8s);
+                            }
                         }
                         mainWindow.pack();
                         mainWindow.revalidate();
